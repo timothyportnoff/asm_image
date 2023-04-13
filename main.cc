@@ -10,11 +10,26 @@ void print_image (unsigned char *in, int width, int height) {
 	for (int i = 0; i < width*height*3; i++)
 		cout << (unsigned int)in[i] << endl;
 }
+
 #ifdef prewitt_filter
 extern "C" {
 	void prewitt(unsigned char *in,unsigned char *out, int width, int height);
 }
-#else 
+#else
+#endif
+
+#ifdef pastel_filter//
+extern "C" {
+	void pastel(unsigned char *in,unsigned char *out, int width, int height);
+}
+#else
+#endif
+
+#ifdef watermark_filter//
+extern "C" {
+	void watermark(unsigned char *in,unsigned char *out, int width, int height);
+}
+#else
 #endif
 
 /*#ifdef student_darken
@@ -77,23 +92,42 @@ int main(int argc, char **argv) {
 	CImg<unsigned char> darkimage(image.width(),image.height(),1,3,0);
 	clock_t end_time = clock();
 	cerr << "Image load time: " << double(end_time - start_time)/CLOCKS_PER_SEC << " secs\n";
-
-	//PHASE 2 - Do the image processing operation
 	start_time = clock();
-//#ifdef student_darken
+	//PHASE 2 - Do the image processing operation
+	//#ifdef student_darken
 	//sdarken(image,darkimage,image.width(),image.height());
 	//end_time = clock();
 	//cerr << "Student Darken time: " << double(end_time - start_time)/CLOCKS_PER_SEC << " secs\n";
-//#else
+	//#else
 	//darken(image,darkimage,image.width(),image.height());
 	//end_time = clock();
 	//cerr << "Reference Darken time: " << double(end_time - start_time)/CLOCKS_PER_SEC << " secs\n";
-//#endif
+	//#endif
+
 #ifdef prewitt_filter
+	start_time = clock();
 	prewitt(image,darkimage,image.width(),image.height());
 	end_time = clock();
 	cerr << "Prewitt Kernel Edge Detection Time: " << double(end_time - start_time)/CLOCKS_PER_SEC << " secs\n";
-#elif defined(student_darken)
+	image = darkimage;
+#else
+#endif
+
+#ifdef pastel_filter
+	start_time = clock();
+	pastel(image,darkimage,image.width(),image.height());
+	end_time = clock();
+	cerr << "Pastel Time: " << double(end_time - start_time)/CLOCKS_PER_SEC << " secs\n";
+	image = darkimage;
+#else
+#endif
+
+#ifdef watermark_filter
+	start_time = clock();
+	watermark(image,darkimage,image.width(),image.height());
+	end_time = clock();
+	cerr << "Watermark Time: " << double(end_time - start_time)/CLOCKS_PER_SEC << " secs\n";
+	image = darkimage;
 #else
 #endif
 
