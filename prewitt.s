@@ -36,6 +36,7 @@ loop:
 	blt skip
      LDRB R11, [R0,R10] ;//Loads red value
      add r7, r11
+	VADD s0, s0
      LDRB R11, [R5,R10] ;//Loads blue value
      add r8, r11
      LDRB R11, [R6,R10] ;//Loads green value
@@ -133,10 +134,10 @@ loop:
      ADD R8, R7, R4 @R8 is the start of the blue plane for output
 
 	;//Check to see if the total is above our horizontal threshold
-	cmp r12, #90
-	bge trace_medium
-	cmp r12, #60
-	bge trace_light
+	cmp r12, #240
+	bge pass;//trace_medium
+	//cmp r12, #100
+	//bge trace_light
 
 	;//==================================================
 
@@ -145,35 +146,35 @@ loop:
 	mov r12, #0
 
 	;//n
-	subs r10, r9, r2
-	blt skip
-     LDRB R11, [R0,R10] ;//Loads red value
-     add r7, r11
-     LDRB R11, [R5,R10] ;//Loads blue value
-     add r8, r11
-     LDRB R11, [R6,R10] ;//Loads green value
-     add r12, r11
+	subs r10, r9, r2	;//Move to north pixel
+	blt skip			;//If the pixel is under bounds
+     LDRB R11, [R0,R10] 	;//Loads red value
+     add r7, r11 		;//Add red to total
+     LDRB R11, [R5,R10] 	;//Loads green value
+     add r8, r11		;//Add green to total
+     LDRB R11, [R6,R10] 	;//Loads blue value
+     add r12, r11		;//Add blue to total
 
 	;//n_w
 	subs r10, #1
-	blt check_n_e
-     LDRB R11, [R0,R10] ;//Loads red value
+	blt check_n_e		;//If the pixel is under bounds
+     LDRB R11, [R0,R10]	;//Loads red value
      add r7, R11
-     LDRB R11, [R5,R10] ;//Loads blue value
+     LDRB R11, [R5,R10] 	;//Loads green value
      add r8, R11
-     LDRB R11, [R6,R10] ;//Loads green value
+     LDRB R11, [R6,R10] 	;//Loads blue value
      add r12, R11
 
 	;//n_e
 	check_n_e:
 	add r10, #2
 	cmp r10, r4
-	bge trash
+	bge trash;//If the pixel is over bounds
      LDRB R11, [R0,R10] ;//Loads red value
      add r7, R11
-     LDRB R11, [R5,R10] ;//Loads blue value
+     LDRB R11, [R5,R10] ;//Loads green value
      add r8, R11
-     LDRB R11, [R6,R10] ;//Loads green value
+     LDRB R11, [R6,R10] ;//Loads blue value
      add r12, R11
 	trash:
 
@@ -188,31 +189,31 @@ loop:
 	bge skip
      LDRB R11, [R0,R10] ;//Loads red value
      add r7, R11
-     LDRB R11, [R5,R10] ;//Loads blue value
+     LDRB R11, [R5,R10] ;//Loads green value
      add r8, R11
-     LDRB R11, [R6,R10] ;//Loads green value
+     LDRB R11, [R6,R10] ;//Loads blue value
      add r12, R11
 
 	;//s_e
 	add r10, #1
 	cmp r10, r4
-	bge check_s_w_2
+	bge check_s_w_2;//If the pixel is over bounds
 	LDRB R11, [R0,R10] ;//Loads red value
      add r7, R11
-     LDRB R11, [R5,R10] ;//Loads blue value
+     LDRB R11, [R5,R10] ;//Loads green value
      add r8, R11
-     LDRB R11, [R6,R10] ;//Loads green value
+     LDRB R11, [R6,R10] ;//Loads blue value
      add r12, R11
 
 	;//s_w
 	check_s_w_2:
 	subs r10, #2
-	blt panda
+	blt panda;//If the pixel is over bounds
 	LDRB R11, [R0,R10] ;//Loads red value
      add r7, r11
-     LDRB R11, [R5,R10] ;//Loads blue value
+     LDRB R11, [R5,R10] ;//Loads green value
      add r8, R11
-     LDRB R11, [R6,R10] ;//Loads green value
+     LDRB R11, [R6,R10] ;//Loads blue value
      add r12, r11
 	panda:
 
@@ -247,11 +248,11 @@ loop:
      ADD R8, R7, R4 @R8 is the start of the blue plane for output
 
 	;//Check to see if the total is above our horizontal threshold
-	cmp r12, #90
-	bge trace_medium
-	cmp r12, #60
-	bge trace_light
-	bal pass
+	cmp r12, #240
+	bge pass
+	//cmp r12, #100
+	//bge trace_light
+	bal skip;//pass
 
 	;//==================================================
 
@@ -320,9 +321,9 @@ loop:
 
 	trace_gray:
 	mov r5, #220
-     STRB R5, [R8,R9] //Store the blue value
      STRB R5, [R1,R9] //Store the red value
      STRB R5, [R7,R9] //Store the green value
+     STRB R5, [R8,R9] //Store the blue value
      ADD R5, R0, R4 ;//RESET GREEN PLANE START
 	bal skip
 
