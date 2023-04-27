@@ -1,30 +1,18 @@
 .global prewitt
 prewitt:
 	;// void prewitt(unsigned char *in,unsigned char *out, int width, int height);
-	push {LR}
-	PUSH {R4-R12} //Preserve registers the ABI says we must preserve
-	;//R0 is *in
-     ;//R1 is *out
-     ;//R2 is width
-     ;//R3 is height
-     ;//R4 is how many bytes to process
-     ;//R5 is input green
-     ;//R6 is input blue
-     ;//R7 is output green
-     ;//R8 is output blue
-     ;//R9 is i
-
-     MULS R4,R2,R3 @R4 will hold how many bytes to process - this is enough for the red part
-     MOV R3, #21845 //Used in the multiply below
-     BLE quit @If image is zero size, quit
-
-     ADD R5, R0, R4 @R5 is the start of the green plane for input
-     ADD R6, R5, R4 @R6 is the start of the blue plane for input
-     ADD R7, R1, R4 @R7 is the start of the green plane for output
-     ADD R8, R7, R4 @R8 is the start of the blue plane for output
-     MOV R9, #0 //Your i
-
      @TODO: Make sure the size of the array is divisible by 128 bits
+	push {LR}
+	PUSH {R4-R12} 	;//Preserve registers the ABI says we must preserve
+
+     MULS R4,R2,R3 	;//@R4 will hold how many bytes to process - this is enough for the red part
+     MOV R3, #21845 ;//@R3 Used in the multiply below, magic number??
+     BLE quit		;//If image is zero size, quit
+     ADD R5, R0, R4 ;//@R5 is the start of the green plane for input
+     ADD R6, R5, R4 ;//@R6 is the start of the blue plane for input
+     ADD R7, R1, R4 ;//@R7 is the start of the green plane for output
+     ADD R8, R7, R4 ;//@R8 is the start of the blue plane for output
+     MOV R9, #0 	;//@R9 iterator variable
 
 loop:
 	mov r7, #0
@@ -36,7 +24,7 @@ loop:
 	blt skip
      LDRB R11, [R0,R10] ;//Loads red value
      add r7, r11
-	VADD s0, s0
+	//VADD s0, s0
      LDRB R11, [R5,R10] ;//Loads blue value
      add r8, r11
      LDRB R11, [R6,R10] ;//Loads green value
